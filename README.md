@@ -21,6 +21,86 @@ flowchart LR
     end
 ```
 
+## Concepts
+
+### What is a Foundry Toolbox?
+
+A **toolbox** is a managed resource in a Microsoft Foundry project. You choose a set of tools once and publish them behind **one MCP-compatible endpoint**. You don't wire each tool, credential and policy into every agent separately. Agents connect to the toolbox endpoint and find the tools at runtime.
+
+**The problem it solves.** Without a toolbox, every agent sets up its own tools. That leads to:
+- duplicated work across teams
+- credentials copied into many places
+- inconsistent governance
+- every tool change requiring an agent change and a redeploy
+
+As the number of agents grows, this becomes expensive to run and hard to secure.
+
+**What a toolbox gives you:**
+
+| Capability | What it means |
+|---|---|
+| **Single endpoint** | An agent connects to one MCP endpoint and gets every tool behind it. You can add, remove or reconfigure tools without changing agent code. |
+| **Centralized authentication** | The toolbox injects credentials, refreshes tokens and enforces policy at runtime, using project connections, Microsoft Entra ID, managed identity or OAuth identity passthrough. Agents never hold tool credentials. |
+| **Governance** | You can apply guardrails (Responsible AI policies) to tool inputs and outputs at the toolbox level. |
+| **Versioning** | Each change creates an immutable version. You test a version on its own endpoint and then **promote** it to default. Every agent on the consumer endpoint picks it up without being redeployed. |
+| **Reuse across runtimes** | Toolboxes live in Foundry but aren't tied to it. Foundry prompt agents, hosted agents, Microsoft Agent Framework, LangGraph, GitHub Copilot and any MCP client can use the same toolbox. |
+| **Tool search and skills** | Find tools on demand, and attach reusable [skills](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/skills). |
+
+**What can go in a toolbox:** MCP servers, OpenAPI tools, Web Search, Azure AI Search, File Search, Code Interpreter, Agent-to-Agent (A2A), browser automation, Fabric IQ, Work IQ, skills and tool search.
+
+Function calling can't go in a toolbox, because your own code runs it client-side. Attach function tools directly to the agent instead.
+
+**Two endpoints:**
+
+| Endpoint | URL | Use it for |
+|---|---|---|
+| Consumer | `{project_endpoint}/toolboxes/{name}/mcp?api-version=v1` | Agents in production. It always serves the **default version**. |
+| Version-specific | `{project_endpoint}/toolboxes/{name}/versions/{version}/mcp?api-version=v1` | Testing a new version before you promote it |
+
+Tool names inside a toolbox are namespaced by source, for example `weather___GetCurrentWeather` for an OpenAPI operation or `microsoft_learn___microsoft_docs_fetch` for an MCP tool.
+
+### What is tool search?
+
+As a toolbox grows to dozens or hundreds of tools, sending every tool definition to the model on every turn causes three problems:
+
+1. **Cost.** Every tool definition adds input tokens, whether or not the model uses that tool.
+2. **Context.** Tool schemas take up space that conversation history and grounding data need.
+3. **Accuracy.** With a long list to choose from, the model is more likely to pick a similar but wrong tool.
+
+**Tool search** solves this. When you add `{"type": "toolbox_search"}` to a toolbox, `tools/list` hides every tool and returns only two meta-tools:
+
+- **`tool_search`**: the model describes what it needs, for example `"currency exchange"`, and gets back the best-matching tool definitions. It takes a `query` and an optional `limit` (default 5, max 10).
+- **`call_tool`**: the model calls any tool it found, by name.
+
+The model can call `tool_search` several times in one turn, and tools it finds stay callable for the rest of that turn. Foundry ranks matches with **BM25** over each tool's name, description and parameters. That's why good tool descriptions matter so much.
+
+**Tuning discovery:**
+
+| Option | Effect |
+|---|---|
+| **Pin** (`tool_configs: {"<tool>": {"pin": true}}`, or `"*"` for all) | The tool always appears in `tools/list` next to the meta-tools, so no search round-trip is needed. |
+| **`additional_search_text`** | Adds your organisation's vocabulary to a tool's search index. It's used only for ranking and is never shown to the model. |
+| **Auto-pinning** | Foundry tracks which tools each user calls most and shows them directly after a short warm-up. No setup needed. |
+
+**When to use it:** for toolboxes with roughly **10–15+ tools**, or when different tasks need different subsets of tools.
+
+**Best practices:**
+- Give every tool a clear description.
+- Tell the model in its instructions to call `tool_search` before saying it can't do something.
+- Pin tools that are needed on almost every turn.
+
+### Inline tools vs. toolbox with tool search
+
+| | Inline tools | Toolbox + tool search |
+|---|---|---|
+| Where tools are defined | On each agent | Once, in the toolbox |
+| Credentials | Set up per agent | Managed centrally by the toolbox |
+| Changing a tool | Update and redeploy every agent | Publish a new toolbox version and promote it |
+| What the model sees each turn | Every tool definition | `tool_search` + `call_tool` (+ pinned tools) |
+| Token cost as tools grow | Grows with every tool added | Stays roughly flat |
+| Extra model turns | None | One `tool_search` round-trip per capability (unless pinned) |
+| Best for | A small, fixed set of tools | Large or shared tool catalogs, many agents, governed environments |
+
 ## Tools used
 
 Every tool calls a free public API. None of them needs an API key.
