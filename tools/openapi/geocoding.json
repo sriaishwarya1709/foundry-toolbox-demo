@@ -1,0 +1,24 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Open-Meteo geocoding",
+    "description": "Look up latitude, longitude, country and timezone for a place name.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://geocoding-api.open-meteo.com" }],
+  "paths": {
+    "/v1/search": {
+      "get": {
+        "operationId": "SearchLocation",
+        "summary": "Find coordinates (latitude/longitude), country code and IANA timezone for a city name.",
+        "parameters": [
+          { "name": "name", "in": "query", "required": true, "description": "City or place name.", "schema": { "type": "string" } },
+          { "name": "count", "in": "query", "required": false, "description": "Max results. Use 1.", "schema": { "type": "integer", "default": 1 } }
+        ],
+        "responses": {
+          "200": { "description": "Matching locations.", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Open-Meteo forecast",
+    "description": "Multi-day weather forecast by coordinates. Use SearchLocation first to get coordinates.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://api.open-meteo.com" }],
+  "paths": {
+    "/v1/forecast": {
+      "get": {
+        "operationId": "GetDailyForecast",
+        "summary": "Get a daily weather forecast (min/max temperature, precipitation) for up to 16 days at given coordinates.",
+        "parameters": [
+          { "name": "latitude", "in": "query", "required": true, "schema": { "type": "number" } },
+          { "name": "longitude", "in": "query", "required": true, "schema": { "type": "number" } },
+          {
+            "name": "daily",
+            "in": "query",
+            "required": true,
+            "description": "Always use 'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max'.",
+            "schema": { "type": "string", "default": "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max" }
+          },
+          { "name": "forecast_days", "in": "query", "required": false, "description": "Number of days (1-16).", "schema": { "type": "integer", "default": 5 } },
+          { "name": "timezone", "in": "query", "required": true, "description": "Always use 'auto'.", "schema": { "type": "string", "default": "auto" } }
+        ],
+        "responses": {
+          "200": { "description": "Daily forecast.", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    }
+  }
+}

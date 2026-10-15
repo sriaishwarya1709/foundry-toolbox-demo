@@ -1,0 +1,58 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Nager.Date public holidays",
+    "description": "Public holidays and long weekends for 100+ countries.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://date.nager.at" }],
+  "paths": {
+    "/api/v3/PublicHolidays/{year}/{countryCode}": {
+      "get": {
+        "operationId": "GetPublicHolidays",
+        "summary": "List all public holidays in a country for a given year.",
+        "parameters": [
+          { "name": "year", "in": "path", "required": true, "schema": { "type": "integer" } },
+          { "name": "countryCode", "in": "path", "required": true, "description": "ISO 3166 alpha-2 code, e.g. FR, JP.", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Holidays.", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } } }
+        }
+      }
+    },
+    "/api/v3/NextPublicHolidays/{countryCode}": {
+      "get": {
+        "operationId": "GetNextPublicHolidays",
+        "summary": "List the upcoming public holidays in a country for the next 365 days.",
+        "parameters": [
+          { "name": "countryCode", "in": "path", "required": true, "description": "ISO 3166 alpha-2 code.", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Holidays.", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } } }
+        }
+      }
+    },
+    "/api/v3/LongWeekend/{year}/{countryCode}": {
+      "get": {
+        "operationId": "GetLongWeekends",
+        "summary": "List long weekends (holiday bridges) in a country for a given year - useful for planning trips.",
+        "parameters": [
+          { "name": "year", "in": "path", "required": true, "schema": { "type": "integer" } },
+          { "name": "countryCode", "in": "path", "required": true, "description": "ISO 3166 alpha-2 code.", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Long weekends.", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } } }
+        }
+      }
+    },
+    "/api/v3/AvailableCountries": {
+      "get": {
+        "operationId": "ListHolidayCountries",
+        "summary": "List all countries supported by the public holiday service.",
+        "responses": {
+          "200": { "description": "Countries.", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } } }
+        }
+      }
+    }
+  }
+}

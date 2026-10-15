@@ -1,0 +1,29 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "US State Department travel advisories",
+    "description": "Official U.S. Department of State travel advisory level (1-4) and summary for a country.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://cadataapi.state.gov" }],
+  "paths": {
+    "/api/TravelAdvisories/{countryCode}": {
+      "get": {
+        "operationId": "GetTravelAdvisory",
+        "summary": "Get the U.S. State Department travel advisory level and safety summary for a country.",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "path",
+            "required": true,
+            "description": "Two-letter FIPS 10-4 country code used by the State Department (NOT ISO). Examples: FR=France, JA=Japan, GM=Germany, UK=United Kingdom, SP=Spain, IT=Italy, MX=Mexico, CH=China, IN=India, BR=Brazil, AS=Australia, EI=Ireland.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Advisory entries (empty array if code not found).", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } } }
+        }
+      }
+    }
+  }
+}

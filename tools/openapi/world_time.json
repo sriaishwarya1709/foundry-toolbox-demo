@@ -1,0 +1,23 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "TimeAPI world clock",
+    "description": "Current local date and time in any IANA timezone.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://timeapi.io" }],
+  "paths": {
+    "/api/time/current/zone": {
+      "get": {
+        "operationId": "GetCurrentLocalTime",
+        "summary": "Get the current local date, time and day of week in an IANA timezone such as Europe/Paris or Asia/Tokyo.",
+        "parameters": [
+          { "name": "timeZone", "in": "query", "required": true, "description": "IANA timezone, e.g. Asia/Tokyo.", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Local time.", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    }
+  }
+}

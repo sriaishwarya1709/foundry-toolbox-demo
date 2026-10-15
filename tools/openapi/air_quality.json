@@ -1,0 +1,31 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Open-Meteo air quality",
+    "description": "Current air quality index and particulate levels by coordinates.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://air-quality-api.open-meteo.com" }],
+  "paths": {
+    "/v1/air-quality": {
+      "get": {
+        "operationId": "GetCurrentAirQuality",
+        "summary": "Get the current US AQI, PM2.5, PM10 and ozone levels at given coordinates.",
+        "parameters": [
+          { "name": "latitude", "in": "query", "required": true, "schema": { "type": "number" } },
+          { "name": "longitude", "in": "query", "required": true, "schema": { "type": "number" } },
+          {
+            "name": "current",
+            "in": "query",
+            "required": true,
+            "description": "Always use 'us_aqi,pm2_5,pm10,ozone'.",
+            "schema": { "type": "string", "default": "us_aqi,pm2_5,pm10,ozone" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Current air quality.", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "wttr.in current weather",
+    "description": "Current weather conditions for any city via wttr.in.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://wttr.in" }],
+  "paths": {
+    "/{location}": {
+      "get": {
+        "operationId": "GetCurrentWeather",
+        "summary": "Get the current weather (condition, temperature, humidity, wind) for a city.",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "description": "City name, for example Paris or New York.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": true,
+            "description": "Output format. Always use 4.",
+            "schema": { "type": "integer", "default": 4 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weather summary as plain text.",
+            "content": { "text/plain": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    }
+  }
+}

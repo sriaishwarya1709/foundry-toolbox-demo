@@ -1,0 +1,48 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Frankfurter currency exchange",
+    "description": "Foreign exchange rates published by the European Central Bank.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://api.frankfurter.dev" }],
+  "paths": {
+    "/v1/latest": {
+      "get": {
+        "operationId": "GetLatestExchangeRates",
+        "summary": "Get the latest currency exchange rates from a base currency, optionally converting an amount.",
+        "parameters": [
+          { "name": "base", "in": "query", "required": true, "description": "ISO 4217 base currency, e.g. USD.", "schema": { "type": "string" } },
+          { "name": "symbols", "in": "query", "required": false, "description": "Comma-separated target currencies, e.g. EUR,JPY.", "schema": { "type": "string" } },
+          { "name": "amount", "in": "query", "required": false, "description": "Amount of base currency to convert.", "schema": { "type": "number" } }
+        ],
+        "responses": {
+          "200": { "description": "Rates.", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    },
+    "/v1/{date}": {
+      "get": {
+        "operationId": "GetHistoricalExchangeRates",
+        "summary": "Get currency exchange rates for a specific past date.",
+        "parameters": [
+          { "name": "date", "in": "path", "required": true, "description": "Date in YYYY-MM-DD format.", "schema": { "type": "string" } },
+          { "name": "base", "in": "query", "required": true, "description": "ISO 4217 base currency, e.g. USD.", "schema": { "type": "string" } },
+          { "name": "symbols", "in": "query", "required": false, "description": "Comma-separated target currencies.", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Rates.", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    },
+    "/v1/currencies": {
+      "get": {
+        "operationId": "ListSupportedCurrencies",
+        "summary": "List all supported currency codes and their names.",
+        "responses": {
+          "200": { "description": "Currencies.", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    }
+  }
+}

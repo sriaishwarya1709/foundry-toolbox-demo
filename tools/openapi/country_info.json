@@ -1,0 +1,39 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "World Bank country data",
+    "description": "Country profile (capital, region, income level) and economic/demographic indicators.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://api.worldbank.org" }],
+  "paths": {
+    "/v2/country/{countryCode}": {
+      "get": {
+        "operationId": "GetCountryProfile",
+        "summary": "Get a country's official name, capital city, region, income level and coordinates.",
+        "parameters": [
+          { "name": "countryCode", "in": "path", "required": true, "description": "ISO 3166 alpha-2 code, e.g. FR, JP, DE.", "schema": { "type": "string" } },
+          { "name": "format", "in": "query", "required": true, "description": "Always 'json'.", "schema": { "type": "string", "default": "json" } }
+        ],
+        "responses": {
+          "200": { "description": "Country profile.", "content": { "application/json": { "schema": { "type": "array", "items": {} } } } }
+        }
+      }
+    },
+    "/v2/country/{countryCode}/indicator/{indicator}": {
+      "get": {
+        "operationId": "GetCountryIndicator",
+        "summary": "Get the latest value of a World Bank indicator such as population (SP.POP.TOTL), GDP in USD (NY.GDP.MKTP.CD), GDP per capita (NY.GDP.PCAP.CD) or inflation (FP.CPI.TOTL.ZG).",
+        "parameters": [
+          { "name": "countryCode", "in": "path", "required": true, "description": "ISO 3166 alpha-2 code, e.g. FR, JP, DE.", "schema": { "type": "string" } },
+          { "name": "indicator", "in": "path", "required": true, "description": "Indicator id, e.g. SP.POP.TOTL.", "schema": { "type": "string" } },
+          { "name": "format", "in": "query", "required": true, "description": "Always 'json'.", "schema": { "type": "string", "default": "json" } },
+          { "name": "mrv", "in": "query", "required": true, "description": "Most recent values. Always 1.", "schema": { "type": "integer", "default": 1 } }
+        ],
+        "responses": {
+          "200": { "description": "Indicator value.", "content": { "application/json": { "schema": { "type": "array", "items": {} } } } }
+        }
+      }
+    }
+  }
+}
